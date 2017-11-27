@@ -33,9 +33,12 @@ sudo apt-get -y upgrade \
 sudo pip install tensorflow
 ```
 
-* Create Google Cloud Storage Bucket
+* Create Google Cloud Storage Bucket for MNIST 
 
 ```
+BUCKET="mnist-$RANDOM-$RANDOM"
+gsutil mb -c regional -l us-east1 gs://${BUCKET}
+
 sudo ./scripts/create_records.py
 gsutil cp /tmp/data/train.tfrecords gs://${BUCKET}/data/
 gsutil cp /tmp/data/test.tfrecords gs://${BUCKET}/data/```
