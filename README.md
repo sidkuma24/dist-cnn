@@ -60,7 +60,7 @@ gcloud compute instances create \
 master-0 worker-0 worker-1 ps-0 \
 --image template-image \
 --machine-type n1-standard-2 \
---scopes=default,storage-rw```
+--scopes=default,storage-rw
 ```
 
 * Train the model
