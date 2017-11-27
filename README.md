@@ -52,6 +52,7 @@ gcloud compute images create template-image \
 --source-disk template-instance
 ```
 * Create Other instances:
+```
 gcloud compute instances create \
 master-0 worker-0 worker-1 ps-0 \
 --image template-image \
@@ -59,15 +60,8 @@ master-0 worker-0 worker-1 ps-0 \
 --scopes=default,storage-rw```
 ```
 
+* Train the model
+````
+./scripts/start-training.sh gs://${BUCKET}
 
-
-PROJECT_ID=$(gcloud config list project --format "value(core.project)")
-BUCKET="${PROJECT_ID}-ml"
-
-gsutil mb -c regional -l us-central1 gs://${BUCKET}
-
-./scripts/create_records.py
-gsutil cp /tmp/data/train.tfrecords gs://${BUCKET}/data/
-gsutil cp /tmp/data/test.tfrecords gs://${BUCKET}/data/
-
-JOB_NAME="job_$(date +%Y%m%d_%H%M%S)"
+````
