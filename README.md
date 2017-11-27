@@ -1,0 +1,3 @@
+## Commands for Training CNN:
+
+```
