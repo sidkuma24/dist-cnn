@@ -1,14 +1,69 @@
 ## Commands for Training CNN:
-
-https://console.cloud.google.com/home/dashboard?project=cnn-mnist-186003
-
 ```
-gcloud ml-engine models list
-
+gcloud config set compute/zone us-east1-c
+````
+```
+gcloud config set project [YOUR_PROJECT_ID]
+```
 ```
 git clone https://github.com/sidkuma24/dist-cnn/
+```
+* Create the template instance : 
+```
+gcloud compute instances create template-instance \
+--image-project ubuntu-os-cloud \
+--image-family ubuntu-1604-lts \
+--boot-disk-size 10GB \
+--machine-type n1-standard-1
+
+```
+
+```
+gcloud compute ssh template-instance
+
+```
+
+```
+sudo apt-get update
+sudo apt-get -y upgrade \
+&& sudo apt-get install -y python-pip python-dev
+
+```
+```
+sudo pip install tensorflow
+```
+
+* Create Google Cloud Storage Bucket
+
+```
+sudo ./scripts/create_records.py
+gsutil cp /tmp/data/train.tfrecords gs://${BUCKET}/data/
+gsutil cp /tmp/data/test.tfrecords gs://${BUCKET}/data/```
+```
+
+* Create template instance
+```
+gcloud compute instances set-disk-auto-delete template-instance \
+--disk template-instance --no-auto-delete
+
+gcloud compute instances delete template-instance
+
+gcloud compute images create template-image \
+--source-disk template-instance
+```
+* Create Other instances:
+gcloud compute instances create \
+master-0 worker-0 worker-1 ps-0 \
+--image template-image \
+--machine-type n1-standard-2 \
+--scopes=default,storage-rw```
+```
+
+
+
 PROJECT_ID=$(gcloud config list project --format "value(core.project)")
 BUCKET="${PROJECT_ID}-ml"
+
 gsutil mb -c regional -l us-central1 gs://${BUCKET}
 
 ./scripts/create_records.py
@@ -16,15 +71,3 @@ gsutil cp /tmp/data/train.tfrecords gs://${BUCKET}/data/
 gsutil cp /tmp/data/test.tfrecords gs://${BUCKET}/data/
 
 JOB_NAME="job_$(date +%Y%m%d_%H%M%S)"
-gcloud ml-engine jobs submit training ${JOB_NAME} \
-    --package-path trainer \
-    --module-name trainer.task \
-    --staging-bucket gs://${BUCKET} \
-    --job-dir gs://${BUCKET}/${JOB_NAME} \
-    --runtime-version 1.2 \
-    --region us-central1 \
-    --config config/config.yaml \
-    -- \
-    --data_dir gs://${BUCKET}/data \
-    --output_dir gs://${BUCKET}/${JOB_NAME} \
-    --train_steps 10000
