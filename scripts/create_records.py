@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-"""Converts MNIST data to TFRecords file format with Example protos."""
+#Converts MNIST data to TFRecords file format
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
